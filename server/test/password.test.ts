@@ -22,7 +22,7 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   cfg = loadConfig(env());
-  db = createDb({});
+  db = await createDb({});
   await migrate(db);
   app = createApp({ cfg, db }).app;
 });

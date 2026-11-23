@@ -1,0 +1,9 @@
+.pglite
+**/.pglite
+server/test
+docs
+*.log
+.env
+.env.*
+!.env.example
+.git

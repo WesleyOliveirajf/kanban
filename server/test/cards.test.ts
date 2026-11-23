@@ -27,7 +27,7 @@ beforeEach(async () => {
     GOOGLE_CLIENT_SECRET: "s",
     OWNER_GOOGLE_SUB: OWNER,
   } as NodeJS.ProcessEnv);
-  db = createDb({});
+  db = await createDb({});
   await migrate(db);
   const built = createApp({ cfg, db, idp, now: () => clock });
   app = built.app;

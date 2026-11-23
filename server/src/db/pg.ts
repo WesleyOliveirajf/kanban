@@ -14,7 +14,14 @@ function wrap(c: pg.Pool | pg.PoolClient): Queryable {
 }
 
 export function createPgDb(connectionString: string): Db {
-  const pool = new pg.Pool({ connectionString });
+  // Em serverless (Vercel) um pool grande deixa conexões órfãs no Postgres.
+  const serverless = Boolean(process.env.VERCEL);
+  const pool = new pg.Pool({
+    connectionString,
+    max: serverless ? 1 : 10,
+    idleTimeoutMillis: serverless ? 10_000 : 30_000,
+    connectionTimeoutMillis: 10_000,
+  });
   return {
     ...wrap(pool),
     async tx(fn) {

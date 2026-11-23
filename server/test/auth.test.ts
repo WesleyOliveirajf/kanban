@@ -41,7 +41,7 @@ async function login(app: ReturnType<typeof build>["app"], identity: Identity) {
 
 beforeEach(async () => {
   cfg = loadConfig(baseEnv as NodeJS.ProcessEnv);
-  db = createDb({});
+  db = await createDb({});
   await migrate(db);
 });
 afterEach(() => db.close());

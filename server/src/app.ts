@@ -44,6 +44,18 @@ export function createApp({ cfg, db, idp, webDir, now = () => new Date() }: AppD
       res.status(503).json({ ok: false });
     }
   });
+
+  // Cron da Vercel (Authorization: Bearer $CRON_SECRET). Sem segredo = rota desligada.
+  api.get("/cron/purge-sessions", async (req, res) => {
+    const secret = process.env.CRON_SECRET;
+    if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
+      res.status(401).json({ error: "unauthorized" });
+      return;
+    }
+    await sessions.purgeExpired();
+    res.status(204).end();
+  });
+
   api.use("/auth", authRoutes(cfg, idp, sessions));
 
   // Tudo abaixo exige sessão válida do proprietário.

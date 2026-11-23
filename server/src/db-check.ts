@@ -15,7 +15,7 @@ try {
   process.exit(1);
 }
 console.log("Conectando em", where);
-const db = createDb({ databaseUrl: url });
+const db = await createDb({ databaseUrl: url });
 try {
   const [v] = await db.query<{ v: string }>("SELECT version() AS v");
   console.log("OK:", v?.v);
@@ -25,8 +25,8 @@ try {
   const err = e as { code?: string; message: string };
   console.error("FALHOU:", err.code ?? "", err.message);
   const hint: Record<string, string> = {
-    ECONNREFUSED: "Porta fechada ou host errado. Libere o acesso remoto/porta 5432 no painel da Hostinger.",
-    ETIMEDOUT: "Sem resposta: firewall bloqueando o seu IP. Autorize o seu IP no acesso remoto do banco.",
+    ECONNREFUSED: "Porta fechada ou host errado.",
+    ETIMEDOUT: "Sem resposta: firewall ou IP não autorizado no banco.",
     ENOTFOUND: "Host não encontrado: confira o endereço.",
     "28P01": "Usuário ou senha incorretos.",
     "3D000": "O banco informado não existe.",

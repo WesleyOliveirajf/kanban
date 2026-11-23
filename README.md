@@ -1,19 +1,32 @@
 # Kanban pessoal
 
-Aplicação web (React + TypeScript) com API Node + TypeScript e PostgreSQL. Especificação por etapas em `docs/`.
+Aplicação web (React + TypeScript) com API Node + TypeScript e PostgreSQL (Supabase). Especificação por etapas em `docs/`.
 
 ## Desenvolvimento
 ```bash
 npm install
-cp .env.example .env      # defina OWNER_PASSWORD_HASH (veja o arquivo) e SESSION_SECRET
+cp .env.example .env      # defina OWNER_PASSWORD_HASH e SESSION_SECRET
 npm run dev:server        # API em :3000 (PGlite em ./.pglite quando DATABASE_URL está vazio)
 npm run dev:web           # interface em :5173 (proxy /api -> :3000)
 npm test                  # testes da API
 ```
 Login: senha única do proprietário (`OWNER_PASSWORD_HASH`). O login Google é opcional; se usar em dev, defina `BASE_URL=http://localhost:5173` e registre `http://localhost:5173/api/auth/callback` no console Google Cloud.
 
-## Produção
-`npm run build && npm start`: o servidor serve `web/dist` e a API no mesmo domínio. Exige `BASE_URL` https, `DATABASE_URL` (Postgres), `SESSION_SECRET` forte e `OWNER_PASSWORD_HASH`.
+## Produção na Vercel
+1. Conecte o repositório GitHub `WesleyOliveirajf/kanban` a um projeto Vercel.
+2. Variáveis de ambiente (Production + Preview):
+   - `DATABASE_URL` — URI do Supabase (preferir **Session pooler**, porta 6543)
+   - `SESSION_SECRET` — ≥32 caracteres
+   - `OWNER_PASSWORD_HASH` — gerado com `npm run hash-password`
+   - `CRON_SECRET` — segredo para o cron horário de purge de sessões
+   - `BASE_URL` — opcional; se vazio, usa o domínio da Vercel
+3. Deploy: push na `main` ou `vercel --prod`.
+4. A UI sai de `public/` (CDN); a API Express é uma Function (`index.ts`).
+
+Teste local do bundle: `npm run build && vercel dev` (com as mesmas env).
+
+## Produção (Docker)
+`npm run build && npm start` / `docker build -t kanban .`: exige `BASE_URL` https, `DATABASE_URL`, `SESSION_SECRET` e `OWNER_PASSWORD_HASH`.
 
 ## Etapas
 - [x] 1. Base e acesso privado (RF-01) — `docs/etapa-1-rf01.md`
