@@ -1,0 +1,25 @@
+# Deploy na VPS Hostinger (projeto Docker separado do n8n).
+# Traefik do projeto n8n faz o TLS em kanban.srv1631991.hstgr.cloud.
+services:
+  kanban:
+    build:
+      context: https://github.com/WesleyOliveirajf/kanban.git#main
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      BASE_URL: ${BASE_URL}
+      DATABASE_URL: ${DATABASE_URL}
+      SESSION_SECRET: ${SESSION_SECRET}
+      OWNER_PASSWORD_HASH: ${OWNER_PASSWORD_HASH}
+      APP_TIMEZONE: America/Sao_Paulo
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kanban.rule=Host(`kanban.srv1631991.hstgr.cloud`)
+      - traefik.http.routers.kanban.entrypoints=web,websecure
+      - traefik.http.routers.kanban.tls=true
+      - traefik.http.routers.kanban.tls.certresolver=mytlschallenge
+      - traefik.http.services.kanban.loadbalancer.server.port=3000
